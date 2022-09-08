@@ -1,0 +1,34 @@
+image:
+  - Ubuntu
+  - Ubuntu1604
+  # - Ubuntu2004 - Disabled because apt-get fails.
+  - macos
+  - macos-mojave
+  - Visual Studio 2019
+
+environment:
+  CYG_MIRROR: http://mirrors.kernel.org/sourceware/cygwin/
+  matrix:
+    - BUILD: MSVCDYNAMIC64
+    - BUILD: MSVCSTATIC64
+    - BUILD: INSTALLER
+    - BUILD: MinGW32
+    - BUILD: MSYS2
+    - BUILD: MinGW64
+
+artifacts:
+  - path: installer
+
+clone_depth: 5
+
+install:
+  - cmd: 'ci\openssl.bat'
+  - sh:  'if [ $BUILD = MSVCDYNAMIC64 ]; then sudo ci/install.sh; fi'
+
+build_script:
+  - cmd: 'ci\build.bat'
+  - sh:  'if [ $BUILD = MSVCDYNAMIC64 ]; then ci/build.sh; fi'
+
+test_script:
+  - cmd: 'ci\test.bat'
+  - sh:  'if [ $BUILD = MSVCDYNAMIC64 ] && [ $(uname) != Darwin ]; then ci/test.sh; fi'
